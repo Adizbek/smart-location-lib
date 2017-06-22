@@ -43,3 +43,24 @@ out/
 build/
 
 gradle.properties
+
+# SVN files
+.svn
+
+# Mercurial files
+.hg
+
+#lint
+lint.xml
+
+# gradle
+.gradle/
+gradle/
+
+# etc
+version_name.txt
+
+# crashtics
+crashlytics.properties
+crashlytics-build.properties
+com_crashlytics_export_strings.xml
