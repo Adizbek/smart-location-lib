@@ -9,7 +9,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,6 +54,7 @@ public class LocationGooglePlayServicesProvider implements ServiceLocationProvid
     private boolean checkLocationSettings;
     private boolean fulfilledCheckLocationSettings;
     private boolean alwaysShow = true;
+    private Fragment mFragment;
 
     public LocationGooglePlayServicesProvider() {
         checkLocationSettings =  false;
@@ -65,6 +68,21 @@ public class LocationGooglePlayServicesProvider implements ServiceLocationProvid
 
     public LocationGooglePlayServicesProvider(ServiceConnectionListener serviceListener) {
         this();
+        this.serviceListener = serviceListener;
+    }
+
+    public LocationGooglePlayServicesProvider(@NonNull Fragment fragment) {
+        this();
+        mFragment = fragment;
+    }
+
+    public LocationGooglePlayServicesProvider(@NonNull Fragment fragment, GooglePlayServicesListener playServicesListener) {
+        this(fragment);
+        googlePlayServicesListener = playServicesListener;
+    }
+
+    public LocationGooglePlayServicesProvider(@NonNull Fragment fragment, ServiceConnectionListener serviceListener) {
+        this(fragment);
         this.serviceListener = serviceListener;
     }
 
@@ -359,7 +377,13 @@ public class LocationGooglePlayServicesProvider implements ServiceLocationProvid
                     logger.w("Location settings are not satisfied. Show the user a dialog to " +
                             "upgrade location settings. You should hook into the Activity onActivityResult and call this provider's onActivityResult method for continuing this call flow. ");
 
-                    if (context instanceof Activity) {
+                    if (mFragment != null) {
+                        try {
+                            mFragment.startIntentSenderForResult(status.getResolution().getIntentSender(), REQUEST_CHECK_SETTINGS, null, 0, 0, 0, null);
+                        } catch (IntentSender.SendIntentException e) {
+                            logger.i("getIntentSender error unable to execute request.");
+                        }
+                    } else if (context instanceof Activity) {
                         try {
                             // Show the dialog by calling startResolutionForResult(), and check the result
                             // in onActivityResult().
