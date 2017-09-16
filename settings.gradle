@@ -2,3 +2,4 @@
 // rootProject.name = 'SmartLocation'
 include 'library'
 include 'rxjava'
+include 'sample'
